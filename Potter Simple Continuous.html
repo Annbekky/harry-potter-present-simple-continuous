@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harry Potter's First Golden Snitch</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Nunito:wght@700&display=swap');
+
+        :root {
+            --gold: #ffd700;
+            --gold-glow: rgba(255, 215, 0, 0.6);
+            --purple-deep: #2d1b42;
+            --purple-mid: #4a2c6d;
+            --blue-dark: #0f0c29;
+            --blue-mid: #1a1a4a;
+            --text-light: #f8f4ff;
+            --text-gold: #ffd700;
+            --accent-red: #c0392b;
+            --accent-green: #27ae60;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Nunito', sans-serif;
+            color: var(--text-light);
+            touch-action: none;
+            background: url('https://i.postimg.cc/Xq0mW1tD/Gemini_Generated_Image_kxw2yfkxw2yfkxw2.png');
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, var(--gold), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,215,0,0.3), transparent),
+                radial-gradient(2px 2px at 50px 160px, var(--gold), transparent),
+                radial-gradient(2px 2px at 90px 40px, rgba(255,215,0,0.2), transparent),
+                radial-gradient(2px 2px at 130px 80px, var(--gold), transparent),
+                radial-gradient(2px 2px at 160px 120px, rgba(255,215,0,0.3), transparent);
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: sparkle 20s linear infinite;
+            pointer-events: none;
+            opacity: 0.4;
+            z-index: 0;
+        }
+		#game-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3); /* Белая подложка */
+    z-index: 1;
+    pointer-events: none;
+}
+
+        @keyframes sparkle {
+            0% { background-position: 0 0; }
+            100% { background-position: 200px 200px; }
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        canvas {
+            box-shadow: 0 0 30px rgba(106, 76, 154, 0.5), 0 0 60px var(--gold-glow);
+            border-radius: 12px;
+            max-width: 100%;
+            max-height: 100%;
+            background: transparent;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+			z-index: 2; /* ← Поднимает игру выше подложки */
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 2;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            text-shadow: 0 0 10px var(--gold-glow), 2px 2px 0 rgba(0,0,0,0.5);
+            color: var(--text-gold);
+            letter-spacing: 1px;
+        }
+
+        .score-box { 
+            color: var(--gold);
+            text-shadow: 0 0 15px var(--gold-glow);
+        }
+        .lives-box { 
+            color: #ff9e9e;
+            text-shadow: 0 0 10px rgba(255, 100, 100, 0.5);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(15,12,41,0.95) 0%, rgba(45,27,66,0.95) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            pointer-events: auto;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hidden { display: none !important; }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            color: var(--gold);
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px var(--gold-glow), 0 0 40px rgba(255, 215, 0, 0.3);
+            line-height: 1.3;
+            letter-spacing: 2px;
+        }
+
+        p { 
+            font-size: 20px; 
+            max-width: 550px; 
+            margin-bottom: 30px; 
+            line-height: 1.6;
+            color: var(--text-light);
+            opacity: 0.95;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--gold) 0%, #f4c430 100%);
+            color: var(--blue-dark);
+            border: 3px solid var(--gold);
+            padding: 15px 50px;
+            font-size: 22px;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 0 #b8860b, 0 0 20px var(--gold-glow);
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #b8860b, 0 0 35px var(--gold-glow), 0 0 60px rgba(255, 215, 0, 0.4);
+            background: linear-gradient(135deg, #fff9c4 0%, var(--gold) 100%);
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #b8860b, 0 0 15px var(--gold-glow);
+        }
+
+        #quiz-modal {
+            background: linear-gradient(145deg, var(--purple-mid), var(--purple-deep));
+            border: 4px solid var(--gold);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 520px;
+            width: 95%;
+            pointer-events: auto;
+            box-shadow: 0 0 30px rgba(106, 76, 154, 0.7), 0 0 60px var(--gold-glow);
+            color: var(--text-light);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #quiz-modal::before,
+        #quiz-modal::after {
+            content: "✦";
+            position: absolute;
+            color: var(--gold);
+            font-size: 24px;
+            opacity: 0.7;
+        }
+        #quiz-modal::before { top: 10px; left: 15px; }
+        #quiz-modal::after { bottom: 10px; right: 15px; transform: rotate(180deg); }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .quiz-question {
+            font-size: 22px;
+            margin: 25px 0 30px;
+            font-weight: 700;
+            color: var(--text-gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            font-family: 'Cinzel', serif;
+            line-height: 1.4;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quiz-btn {
+            background: linear-gradient(135deg, var(--blue-mid), var(--purple-deep));
+            color: var(--text-light);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            padding: 14px 20px;
+            font-size: 19px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: left;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+        }
+        
+        .quiz-btn:hover {
+            background: linear-gradient(135deg, var(--purple-mid), var(--gold));
+            color: var(--blue-dark);
+            border-color: var(--gold);
+            transform: translateX(5px);
+            box-shadow: 0 0 15px var(--gold-glow);
+        }
+
+        .quiz-feedback {
+            margin-top: 20px;
+            font-weight: 800;
+            font-size: 20px;
+            height: 30px;
+            font-family: 'Cinzel', serif;
+        }
+        .correct { 
+            color: var(--accent-green); 
+            text-shadow: 0 0 10px rgba(39, 174, 96, 0.5);
+        }
+        .wrong { 
+            color: var(--accent-red); 
+            text-shadow: 0 0 10px rgba(192, 57, 43, 0.5);
+        }
+
+        #fireworks-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 32px; }
+            .hud { font-size: 22px; }
+            button { padding: 12px 35px; font-size: 18px; }
+            .quiz-question { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+    <canvas id="fireworks-canvas"></canvas>
+
+    <div class="ui-layer">
+        <div class="hud">
+            <div class="score-box">✨ <span id="scoreDisplay">0</span></div>
+            <div class="lives-box">💜 <span id="livesDisplay">3</span></div>
+        </div>
+    </div>
+
+    <div id="start-screen" class="screen">
+        <h1>⚡ Harry Potter's First<br>Golden Snitch ⚡</h1>
+        <p>Catch the falling Snitches with your basket!<br>
+        Every 5 points, answer a grammar spell!<br>
+        Reach 50 points to become a Wizard Champion! 🪄</p>
+        <button onclick="startGame()">Begin Adventure</button>
+    </div>
+
+    <div id="game-over-screen" class="screen hidden">
+        <h1 style="color: var(--accent-red);">🔮 Game Over</h1>
+        <p>The Snitches escaped...</p>
+        <p>Final Score: <span id="finalScore" style="color:var(--gold);font-weight:bold;">0</span></p>
+        <button onclick="resetGame()">Try Again, Wizard</button>
+    </div>
+
+    <div id="win-screen" class="screen hidden">
+        <h1>🏆 WOW! You Won! 🏆</h1>
+        <p>✨ Amazing flying skills and brilliant grammar!<br>
+        You caught 50 Golden Snitches!<br>
+        Hogwarts is proud of you! 🦁🦡</p>
+        <button onclick="resetGame()">Play Again</button>
+    </div>
+
+    <div id="quiz-screen" class="screen hidden">
+        <div id="quiz-modal">
+            <div style="color: var(--gold); font-size: 13px; margin-bottom: 8px; font-weight: bold; letter-spacing: 2px; text-align: center;">🪄 GRAMMAR SPELL CHECK</div>
+            <div class="quiz-question" id="quiz-text">Question goes here...</div>
+            <div class="quiz-options" id="quiz-options"></div>
+            <div class="quiz-feedback" id="quiz-feedback"></div>
+            <div style="text-align: center; margin-top: 15px; color: rgba(255,255,255,0.5); font-size: 14px;">
+                Question <span id="quiz-number">1</span> of 10
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* =========================================
+       CONFIGURATION & ASSETS
+       ========================================= */
+    
+    const ASSETS = { basket: "https://i.postimg.cc/d05Gwhpr/Gemini_Generated_Image_616l3q616l3q616l_no_bg_preview_(carve_photos).png", snitch: "https://i.postimg.cc/t4h5QC9W/2.png" };
+    const EMOJIS = { basket: "🧺", snitch: "⚽" };
+
+    const QUIZ_DATA = [
+        { q: "Look! It _____ outside.", a: "is raining", b: "rains", correct: 0 },
+        { q: "Harry usually _____ Quidditch on Saturdays.", a: "plays", b: "is playing", correct: 0 },
+        { q: "She _____ eating ice-cream.", a: "is liking", b: "likes", correct: 1 },
+        { q: "Listen! Someone _____ the piano.", a: "plays", b: "is playing", correct: 1 },
+        { q: "She _____ to Hogwarts every year.", a: "goes", b: "is going", correct: 0 },
+        { q: "They _____ dinner at the moment.", a: "eat", b: "are eating", correct: 1 },
+        { q: "The sun _____ in the East.", a: "rises", b: "is rising", correct: 0 },
+        { q: "Why _____ you _____ that hat today?", a: "do / wear", b: "are / wearing", correct: 1 },
+        { q: "I _____ at 7 o'clock every day", a: "wake up", b: "am waking up", correct: 0 },
+        { q: "I _____ a book right now.", a: "read", b: "am reading", correct: 1 },
+        { q: "He _____ coffee every morning.", a: "drinks", b: "is drinking", correct: 0 },
+        { q: "Be quiet! The baby _____.", a: "sleeps", b: "is sleeping", correct: 1 },
+        { q: "We _____ to the cinema very often.", a: "don't go", b: "aren't going", correct: 0 },
+        { q: "Look at that bird! It _____ so high.", a: "flies", b: "is flying", correct: 1 },
+        { q: "My dad _____ in a bank.", a: "works", b: "is working", correct: 0 },
+        { q: "I _____ tired today.", a: "am feeling", b: "feel", correct: 1 },
+        { q: "She _____ her homework right now.", a: "does", b: "is doing", correct: 1 },
+        { q: "Cats _____ milk.", a: "like", b: "are liking", correct: 0 },
+        { q: "What _____ you _____ this weekend?", a: "do / do", b: "are / doing", correct: 1 },
+        { q: "He _____ English very well.", a: "speaks", b: "is speaking", correct: 0 }
+    ];
+
+    let quizDeck = [];
+    let quizIndex = 0;
+
+    /* =========================================
+       GAME ENGINE
+       ========================================= */
+    
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const fwCanvas = document.getElementById('fireworks-canvas');
+    const fwCtx = fwCanvas.getContext('2d');
+
+    function resize() {
+        canvas.width = Math.min(window.innerWidth, 800);
+        canvas.height = window.innerHeight;
+        fwCanvas.width = window.innerWidth;
+        fwCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let gameState = 'start'; 
+    let score = 0;
+    let lives = 3;
+    let frameCount = 0;
+    
+    // 🎯 CONSTANT SPEED - NEVER CHANGES
+    const FALL_SPEED = 4;
+    const SPAWN_RATE = 60;
+
+    const imgBasket = new Image();
+    const imgSnitch = new Image();
+    if(ASSETS.basket) imgBasket.src = ASSETS.basket;
+    if(ASSETS.snitch) imgSnitch.src = ASSETS.snitch;
+
+    const player = {
+        x: canvas.width / 2,
+        y: canvas.height - 130,
+        width: 140,
+        height: 140,
+        speed: 10,
+    };
+
+    let objects = [];
+    const objectSize = 60; 
+    let keys = {};
+    let mouseX = null;
+
+    window.addEventListener('keydown', e => keys[e.code] = true);
+    window.addEventListener('keyup', e => keys[e.code] = false);
+    
+    canvas.addEventListener('mousemove', e => {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+    });
+    
+    canvas.addEventListener('touchmove', e => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.touches[0].clientX - rect.left;
+    }, {passive: false});
+
+    function updatePlayer() {
+        if (keys['ArrowLeft']) player.x -= player.speed;
+        if (keys['ArrowRight']) player.x += player.speed;
+        if (mouseX !== null) player.x = mouseX - player.width / 2;
+        if (player.x < 0) player.x = 0;
+        if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+    }
+
+    function spawnObject() {
+        objects.push({
+            x: Math.random() * (canvas.width - objectSize),
+            y: -objectSize,
+            speed: FALL_SPEED, // 🎯 ALWAYS THE SAME SPEED
+            width: objectSize,
+            height: objectSize,
+            rotation: 0,
+            rotSpeed: 0.02
+        });
+    }
+
+    function updateObjects() {
+        for (let i = objects.length - 1; i >= 0; i--) {
+            let obj = objects[i];
+            obj.y += obj.speed;
+            obj.rotation += obj.rotSpeed;
+
+            if (obj.x < player.x + player.width &&
+                obj.x + obj.width > player.x &&
+                obj.y < player.y + player.height &&
+                obj.y + obj.height > player.y) {
+                score++;
+                updateUI();
+                objects.splice(i, 1);
+                checkQuizTrigger();
+                continue;
+            }
+            if (obj.y > canvas.height) {
+                lives--;
+                updateUI();
+                objects.splice(i, 1);
+                if (lives <= 0) endGame();
+            }
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+        ctx.translate(player.x + player.width/2, player.y + player.height/2);
+        if (ASSETS.basket && imgBasket.complete) {
+            ctx.shadowColor = "rgba(255, 215, 0, 0.5)";
+            ctx.shadowBlur = 15;
+            ctx.drawImage(imgBasket, -player.width/2, -player.height/2, player.width, player.height);
+        } else {
+            ctx.font = "60px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.shadowColor = "rgba(255, 215, 0, 0.6)";
+            ctx.shadowBlur = 20;
+            ctx.fillText(EMOJIS.basket, 0, 5);
+        }
+        ctx.restore();
+
+        objects.forEach(obj => {
+            ctx.save();
+            ctx.translate(obj.x + obj.width/2, obj.y + obj.height/2);
+            ctx.rotate(obj.rotation);
+            
+            if (ASSETS.snitch && imgSnitch.complete) {
+                ctx.shadowColor = "rgba(255, 215, 0, 0.7)";
+                ctx.shadowBlur = 25;
+                ctx.drawImage(imgSnitch, -obj.width/2, -obj.height/2, obj.width, obj.height);
+            } else {
+                ctx.font = "50px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                ctx.shadowBlur = 25;
+                ctx.fillText(EMOJIS.snitch, 0, 0);
+            }
+            ctx.restore();
+        });
+    }
+
+    // 🎯 GAME LOOP - ONLY ONE INSTANCE RUNS
+    function gameLoop() {
+        if (gameState === 'playing') {
+            frameCount++;
+            if (frameCount % SPAWN_RATE === 0) spawnObject();
+            updatePlayer();
+            updateObjects();
+            draw();
+        }
+        if (gameState !== 'gameover' && gameState !== 'start') {
+            requestAnimationFrame(gameLoop);
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('scoreDisplay').innerText = score;
+        document.getElementById('livesDisplay').innerText = lives;
+    }
+
+    function checkQuizTrigger() {
+        if (score > 0 && score % 5 === 0 && score < 50) triggerQuiz();
+        else if (score >= 50) winGame();
+    }
+
+    function triggerQuiz() {
+        gameState = 'quiz';
+        const modal = document.getElementById('quiz-screen');
+        const qText = document.getElementById('quiz-text');
+        const qOptions = document.getElementById('quiz-options');
+        const qFeedback = document.getElementById('quiz-feedback');
+        const qNumber = document.getElementById('quiz-number');
+        
+        const deckIndex = quizDeck[quizIndex];
+        const qData = QUIZ_DATA[deckIndex];
+        
+        qNumber.innerText = quizIndex + 1;
+        
+        qText.innerText = qData.q;
+        qFeedback.innerText = "";
+        qOptions.innerHTML = "";
+
+        [qData.a, qData.b].forEach((text, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-btn';
+            btn.innerText = text;
+            btn.onclick = () => handleQuizAnswer(idx, qData.correct, qFeedback);
+            qOptions.appendChild(btn);
+        });
+        modal.classList.remove('hidden');
+    }
+
+    function handleQuizAnswer(selected, correct, feedbackEl) {
+        const modal = document.getElementById('quiz-screen');
+        if (selected === correct) {
+            feedbackEl.innerText = "✅ Correct! Well done, Wizard!";
+            feedbackEl.className = "quiz-feedback correct";
+            quizIndex++;
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                gameState = 'playing';
+                // 🎯 DON'T call gameLoop() here - it's already running!
+            }, 1000);
+        } else {
+            feedbackEl.innerText = "❌ Oops! -5 Points.";
+            feedbackEl.className = "quiz-feedback wrong";
+            score = Math.max(0, score - 5);
+            quizIndex++;
+            updateUI();
+            setTimeout(() => { 
+                modal.classList.add('hidden'); 
+                gameState = 'playing';
+                // 🎯 DON'T call gameLoop() here - it's already running!
+            }, 1500);
+        }
+    }
+
+    function createQuizDeck() {
+        quizDeck = [];
+        for (let i = 0; i < QUIZ_DATA.length; i++) {
+            quizDeck.push(i);
+        }
+        for (let i = quizDeck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [quizDeck[i], quizDeck[j]] = [quizDeck[j], quizDeck[i]];
+        }
+        quizIndex = 0;
+    }
+
+    function startGame() {
+        document.getElementById('start-screen').classList.add('hidden');
+        createQuizDeck();
+        resetVariables();
+        gameState = 'playing';
+        gameLoop(); // 🎯 Start the loop ONCE
+    }
+
+    function resetGame() {
+        document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('win-screen').classList.add('hidden');
+        stopFireworks();
+        createQuizDeck();
+        resetVariables();
+        gameState = 'playing';
+        gameLoop(); // 🎯 Start the loop ONCE
+    }
+
+    function resetVariables() {
+        score = 0; 
+        lives = 3; 
+        frameCount = 0;
+        objects = []; 
+        mouseX = null;
+        player.x = canvas.width / 2 - player.width / 2;
+        updateUI();
+    }
+
+    function endGame() { 
+        gameState = 'gameover'; 
+        document.getElementById('finalScore').innerText = score; 
+        document.getElementById('game-over-screen').classList.remove('hidden'); 
+    }
+    
+    function winGame() { 
+        gameState = 'win'; 
+        document.getElementById('win-screen').classList.remove('hidden'); 
+        startFireworks(); 
+    }
+
+    /* =========================================
+       MAGICAL FIREWORKS EFFECT
+       ========================================= */
+    let particles = [];
+    let fireworksActive = false;
+
+    function startFireworks() {
+        fireworksActive = true;
+        fireworksLoop();
+    }
+    function stopFireworks() {
+        fireworksActive = false;
+        particles = [];
+        fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+    }
+
+    function createParticle(x, y) {
+        for (let i = 0; i < 35; i++) {
+            particles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 10,
+                vy: (Math.random() - 0.5) * 10,
+                alpha: 1,
+                color: [`#ffd700`, `#9b59b6`, `#3498db`, `#e74c3c`][Math.floor(Math.random()*4)]
+            });
+        }
+    }
+
+    function fireworksLoop() {
+        if (!fireworksActive) return;
+        fwCtx.globalCompositeOperation = 'destination-out';
+        fwCtx.fillStyle = 'rgba(15, 12, 41, 0.15)';
+        fwCtx.fillRect(0, 0, fwCanvas.width, fwCanvas.height);
+        fwCtx.globalCompositeOperation = 'lighter';
+
+        if (Math.random() < 0.08) createParticle(Math.random() * fwCanvas.width, Math.random() * fwCanvas.height * 0.6);
+
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.alpha -= 0.02;
+            fwCtx.fillStyle = p.color;
+            fwCtx.globalAlpha = p.alpha;
+            fwCtx.beginPath();
+            fwCtx.arc(p.x, p.y, Math.random() > 0.5 ? 4 : 2, 0, Math.PI * 2);
+            fwCtx.fill();
+            if (p.alpha <= 0) particles.splice(i, 1);
+        }
+        requestAnimationFrame(fireworksLoop);
+    }
+</script>
+</body>
+</html>
